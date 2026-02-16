@@ -112,7 +112,7 @@ params_year = {
     'mindate': last_year,
     'maxdate': today,
     'datetype': 'pdat',
-    'retmax': 200,  # Get 200 candidates
+    'retmax': 300,  # Get 200 candidates
     'retmode': 'json'
 }
 
