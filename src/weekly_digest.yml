@@ -1,0 +1,49 @@
+nname: Weekly paper digest
+
+on:
+  schedule:
+    # GitHub cron is UTC.
+    # Winter (CET, Zurich UTC+1): 09:30 Zurich = 08:30 UTC
+    # Summer (CEST, Zurich UTC+2): 09:30 Zurich = 07:30 UTC  -> change to "30 7 * * 2" when DST starts
+    - cron: "30 8 * * 2"
+  workflow_dispatch:
+
+jobs:
+  send_digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run weekly digest script
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+
+        run: |
+          python src/weekly_recommend.py
+
+      - name: Commit updated seen_papers.json
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add seen_papers.json
+            git commit -m "Update seen papers"
+            git push
+          else
+            echo "No changes to commit."
+          fi
