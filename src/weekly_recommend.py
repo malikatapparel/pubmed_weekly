@@ -166,23 +166,27 @@ pmids = list(
 print(f"Found {len(pmids)} new candidate papers to evaluate")
 
 # GET FULL DETAILS
-
-if pmids: # if list not empty
-    # PyMed takes the articles
+if pmids:
     candidate_papers = []
-    papers = []
+    # 1) Fetch ALL candidate details once (batched)
+    papers_by_pmid = fetch_details.fetch_papers(pmids, pubmed_api_key)
+
+    # 2) Build candidate texts from the cached results
     for pmid in pmids:
-        try:
-            paper_details = fetch_details.fetch_paper(pmid, pubmed_api_key=pubmed_api_key)
-            # First append the paper details to the papers list
-            papers.append(paper_details)
-            # Then create text for embedding (title + abstract)
-            text = f"{paper_details['title']} {paper_details['abstract']}".lower()
+        paper_details = papers_by_pmid.get(str(pmid)) or papers_by_pmid.get(pmid)
+        if not paper_details:
+            print(f"Missing details for PMID {pmid} (skipping)")
+            continue
 
-            candidate_papers.append((pmid, text))
-        except Exception as e:
-            print(f"Error fetching details for PMID {pmid}: {e}")
+        title = paper_details.get("title", "") or ""
+        abstract = paper_details.get("abstract", "") or ""
+        text = f"{title} {abstract}".lower().strip()
 
+        # skip empty text (rare but happens)
+        if not text:
+            continue
+
+        candidate_papers.append((pmid, text))
   
     #  ML RECOMMENDATION ENGINE  
     if candidate_papers:
@@ -231,10 +235,13 @@ email_body += "YOUR WEEKLY RECOMMENDATIONS\n"
 email_body += "----------------------------------\n\n"
 
 for pmid in top_pmids:
-     top_papers_detail = fetch_details.fetch_paper(pmid, pubmed_api_key=pubmed_api_key)
-     link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
-     paper_body = f"Title: {top_papers_detail['title']}\nAuthors: {', '.join(top_papers_detail['authors'][:3])}\nJournal: {top_papers_detail['journal']}\nLink: {link}\n\n"
-     email_body += paper_body
+    top_papers_detail = papers_by_pmid.get(str(pmid)) or papers_by_pmid.get(pmid)
+    if not top_papers_detail:
+        print(f"Missing cached details for top PMID {pmid}, skipping")
+        continue
+    link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
+    paper_body = f"Title: {top_papers_detail['title']}\nAuthors: {', '.join(top_papers_detail['authors'][:3])}\nJournal: {top_papers_detail['journal']}\nLink: {link}\n\n"
+    email_body += paper_body
 email_body += "Enjoy your reading ☕\n\n"
 email_body += "- Malika\n\n"
 email_body += "Automated weekly recommender\n"

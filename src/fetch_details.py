@@ -1,50 +1,42 @@
 import requests
 import xml.etree.ElementTree as ET
 
-
-def fetch_paper(pmid, pubmed_api_key=None):
-    '''
-    Fetch bibliographic details for a given PubMed ID (PMID) using the NCBI E-utilities API.
-
-    This function queries the NCBI Entrez `efetch` endpoint to retrieve metadata about a 
-    PubMed article in XML format. It extracts and returns key bibliographic details such 
-    as title, abstract, authors, journal name, and publication year.
-    '''
+def fetch_papers(pmids, pubmed_api_key=None, chunk_size=100):
     url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    params = {
-        "db": "pubmed",
-        "id": pmid,
-        "retmode": "xml",
-        "api_key": pubmed_api_key
-    }
+    results = {}
 
-    r = requests.get(url, params=params)
-    r.raise_for_status()
+    for i in range(0, len(pmids), chunk_size):
+        chunk = pmids[i:i+chunk_size]
+        params = {"db": "pubmed", "id": ",".join(map(str, chunk)), "retmode": "xml"}
+        if pubmed_api_key:
+            params["api_key"] = pubmed_api_key
 
-    root = ET.fromstring(r.content)
+        r = requests.get(url, params=params, timeout=30)
+        r.raise_for_status()
 
-    article = root.find(".//PubmedArticle")
+        root = ET.fromstring(r.content)
+        for article in root.findall(".//PubmedArticle"):
+            pmid = article.findtext(".//PMID") or ""
+            title = article.findtext(".//ArticleTitle") or ""
+            abstract = " ".join([(a.text or "") for a in article.findall(".//AbstractText")]).strip()
 
-    title = article.findtext(".//ArticleTitle")
-    abstract = " ".join(
-        [a.text or "" for a in article.findall(".//AbstractText")]
-    )
+            authors = []
+            for author in article.findall(".//Author"):
+                lastname = author.findtext("LastName")
+                firstname = author.findtext("ForeName")
+                if lastname:
+                    authors.append(f"{firstname or ''} {lastname}".strip())
 
-    authors = []
-    for author in article.findall(".//Author"):
-        lastname = author.findtext("LastName")
-        firstname = author.findtext("ForeName")
-        if lastname:
-            authors.append(f"{firstname or ''} {lastname}".strip())
+            journal = article.findtext(".//Journal/Title") or ""
+            pubdate = article.findtext(".//PubDate/Year") or ""
 
-    journal = article.findtext(".//Journal/Title")
-    pubdate = article.findtext(".//PubDate/Year")
+            results[pmid] = {
+                "pmid": pmid,
+                "title": title,
+                "abstract": abstract,
+                "authors": authors,
+                "journal": journal,
+                "pubdate": pubdate,
+            }
 
-    return {
-        "pmid": pmid,
-        "title": title,
-        "abstract": abstract,
-        "authors": authors,
-        "journal": journal,
-        "pubdate": pubdate
-    }
+    return results
