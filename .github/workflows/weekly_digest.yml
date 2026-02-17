@@ -31,7 +31,7 @@ jobs:
           PUBMED_API_KEY: ${{ secrets.PUBMED_API_KEY }}
         run: python src/weekly_recommend.py  
 
-      - name: Commit updated seen_papers.json
+      - name: Commit updated seen_pmids.json
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
@@ -42,6 +42,7 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
 
 
 
