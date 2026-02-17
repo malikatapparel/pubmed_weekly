@@ -4,7 +4,6 @@ Author: Malika Tapparel
 Description:
 This script fetches weekly paper recommendations based on your favorite papers and a set of keywords. 
 '''
-
 # ===============================
 # 1. Define keywords and load your favorite papers
 # ===============================
@@ -77,8 +76,6 @@ from datetime import datetime, timedelta
 from pymed import PubMed
 import os
 import fetch_details
-
-import smtplib
 from email.message import EmailMessage
 
 # ===============================
@@ -92,7 +89,7 @@ print(f"Loaded embeddings: {favorite_embeddings.shape} (your taste profile)")
 
 # TRACK SEEN PAPERS, to avoid repeating the same ones every week
 try:
-    seen_pmids = set(json.load(open('seen_papers.json', 'r')))
+    seen_pmids = set(json.load(open('seen_pmids.json', 'r')))
     print(f"Loaded {len(seen_pmids)} previously seen papers")
 except FileNotFoundError:
     seen_pmids = set()
@@ -208,35 +205,51 @@ for pmid in top_pmids:
      paper_body = f"Title: {top_papers_detail['title']}\nAuthors: {', '.join(top_papers_detail['authors'][:3])}\nJournal: {top_papers_detail['journal']}\nLink: {link}\n\n"
      email_body += paper_body
 email_body += "Enjoy your reading ☕\n\n"
-email_body += "— Malika\n\n"
+email_body += "- Malika\n\n"
 email_body += "Automated weekly recommender\n"
 email_body += f"{n_selected} selected papers from {n_candidates} candidates.\n"
-email_body += f"Mean similarity of top 10 papers: {mean_top_similarity:.2f} -> {similarity_diagnostic}\n\n"
-
-
-
-# Save the seen PMIDs for next time read seen_pmids.json
-# add all candidates to seen (even if not top, to avoid repeats)
-with open('seen_papers.json', 'w') as f:
-    json.dump(list(top_pmids), f)
+email_body += f"Mean similarity of top 10 papers: {mean_top_similarity:.2f} -> {similarity_diagnostic}\n"
 
 # ===============================
 # 3. Send email with recommendations
 # ===============================
 
 # 1. Read secrets from GitHub Actions
-smtp_user = os.environ["SMTP_USER"]
-smtp_pass = os.environ["SMTP_PASS"]
-receiver = os.environ["RECEIVER_EMAIL"]
-# 2. Create email
+try: 
+    # Try to read the secrets but if not available (e.g. local run), read from local file
+    smtp_user = os.environ["SMTP_USER"]
+    smtp_pass = os.environ["SMTP_PASS"]
+    receiver = os.environ["RECEIVER_EMAIL"]
+except KeyError:
+    print("Secrets not found in environment variables, trying local file...")
+    try:
+        with open('data/credentials.json', 'r') as f:
+            creds = json.load(f)
+            smtp_user = creds["smtp_user"]
+            smtp_pass = creds["smtp_pass"]
+            receiver = creds["receiver"]
+    except Exception as e:
+        print(f"Error reading credentials: {e}")
+        raise
+
+# Send email
 msg = EmailMessage()
-msg["Subject"] = "Weekly recommendations"
+msg["Subject"] = "☕ Weekly recommendations"
 msg["From"] = smtp_user
 msg["To"] = receiver
 msg.set_content(email_body)
 
-# 3. Connect to Outlook SMTP and send
+# send first
 with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
-    server.starttls()              # secure connection
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
     server.login(smtp_user, smtp_pass)
     server.send_message(msg)
+    print(f"Email sent to {receiver} with {n_selected} papers recommended.")
+
+# only if send succeeded, update seen items
+seen_pmids.update(top_pmids)
+with open('seen_papers.json', 'w') as f:
+    json.dump(sorted(seen_pmids), f)
+
