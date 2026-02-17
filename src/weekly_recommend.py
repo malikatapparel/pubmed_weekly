@@ -107,7 +107,7 @@ except KeyError:
         print(f"Error reading credentials: {e}")
         raise
 # Add to weekly_recommend.py BEFORE login:
-print(f"SMTP_USER: {smtp_user)  # Shows first 3 chars
+print(f"SMTP_USER: {smtp_user[:3]}***")  # Shows first 3 chars
 print(f"SMTP_PASS length: {len(smtp_pass) if smtp_pass else 0}")
 print(f"RECEIVER_EMAIL: {receiver}")
 # ===============================
