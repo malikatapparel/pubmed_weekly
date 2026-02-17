@@ -88,28 +88,17 @@ smtp_server = "smtp.gmail.com"
 smtp_port = 587
 
 # Retrieve credentials from environment variables (for production) or local file (for development)
-try: 
-    # Try to read the secrets but if not available (e.g. local run), read from local file
-    smtp_user = os.environ["SMTP_USER"]
-    smtp_pass = os.environ["SMTP_PASS"]
-    receiver = os.environ["RECEIVER_EMAIL"]
-    pubmed_api_key = os.environ["PUBMED_API_KEY"]
-except KeyError:
-    print("Secrets not found in environment variables, trying local file...")
-    try:
-        with open('data/credentials.json', 'r') as f:
-            creds = json.load(f)
-            smtp_user = creds["smtp_user"]
-            smtp_pass = creds["smtp_pass"]
-            receiver = creds["receiver"]
-            pubmed_api_key = creds["pubmed_api_key"]
-    except Exception as e:
-        print(f"Error reading credentials: {e}")
-        raise
-# Add to weekly_recommend.py BEFORE login:
-print(f"SMTP_USER: {smtp_user)  # Shows first 3 chars
-print(f"SMTP_PASS length: {len(smtp_pass) if smtp_pass else 0}")
-print(f"RECEIVER_EMAIL: {receiver}")
+try:
+    with open('credentials.json', 'r') as f:
+        creds = json.load(f)
+        smtp_user = creds["smtp_user"]
+        smtp_pass = creds["smtp_pass"]
+        receiver = creds["receiver"]
+        pubmed_api_key = creds["pubmed_api_key"]
+except Exception as e:
+    print(f"Error reading credentials: {e}")
+    raise
+
 # ===============================
 # 3. Load metadata and get paper candidates from keywords
 # ===============================
