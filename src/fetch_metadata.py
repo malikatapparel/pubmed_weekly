@@ -26,25 +26,40 @@ df['journal'] = df['journal'].astype(str)
 df['pubdate'] = df['pubdate'].astype(str)
 df['authors'] = df['authors'].astype(str)
 
-# Check for empty 'title' row and replace with fetched details
-for idx, row in df.iterrows():
-    if pd.isna(row['title']):
-        pmid = row['pmid']
-        details = fetch_details.fetch_paper(pmid)
-        # Get first 3 authors, handle different cases
+# 1) PMIDs that need filling (title is missing)
+missing_mask = df['title'].isna()
+missing_pmids = df.loc[missing_mask, 'pmid'].astype(str).tolist()
+
+if missing_pmids:
+    # 2) Batch fetch once
+    papers_by_pmid = fetch_details.fetch_papers(
+        missing_pmids,
+        pubmed_api_key=None,
+        chunk_size=100
+    )
+
+    # 3) Fill rows
+    for idx, row in df.loc[missing_mask].iterrows():
+        pmid = str(row['pmid'])
+        details = papers_by_pmid.get(pmid)
+
+        if not details:
+            print(f"Missing details for PMID {pmid} (skipping)")
+            continue
+
         authors_list = details.get('authors', [])
         if isinstance(authors_list, list):
-            first_three = authors_list[:3]  # Take first 3
+            first_three = authors_list[:3]
         else:
-            first_three = str(authors_list).split(',')[:3]  # Split string if 
-        # Join as single string
-        authors_str = ', '.join(first_three) if first_three else ''
-        
-        df.iloc[idx, df.columns.get_loc('title')] = str(details['title'])
-        df.iloc[idx, df.columns.get_loc('abstract')] = str(details['abstract'])
-        df.iloc[idx, df.columns.get_loc('journal')] = str(details['journal'])
-        df.iloc[idx, df.columns.get_loc('pubdate')] = str(details['pubdate'])
-        df.iloc[idx, df.columns.get_loc('authors')] = authors_str # Store only the first 3 authors to save space
+            first_three = str(authors_list).split(',')[:3]
+
+        df.at[idx, 'title'] = str(details.get('title', ''))
+        df.at[idx, 'abstract'] = str(details.get('abstract', ''))
+        df.at[idx, 'journal'] = str(details.get('journal', ''))
+        df.at[idx, 'pubdate'] = str(details.get('pubdate', ''))
+        df.at[idx, 'authors'] = ', '.join(first_three) if first_three else ''
+else:
+    print("No missing titles found.")
 
 # Update the dataframe with the new details
 df.to_csv('data/papers.csv', index=False)
