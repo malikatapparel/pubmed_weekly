@@ -29,17 +29,16 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
           PUBMED_API_KEY: ${{ secrets.PUBMED_API_KEY }}
-          
+        run: python src/weekly_recommend.py  # ← ADD THIS LINE
+      
       - name: Debug Secrets
         env:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
-        run: |
+        run: |  # ← ONLY ONE run: per step
           echo "SMTP_USER length: ${#SMTP_USER}"
           echo "SMTP_PASS length: ${#SMTP_PASS}"
           echo "SMTP_PASS first 4: ${SMTP_PASS:0:4}"
-        run: |
-          python src/weekly_recommend.py
 
       - name: Commit updated seen_papers.json
         run: |
@@ -52,6 +51,7 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
 
 
 
