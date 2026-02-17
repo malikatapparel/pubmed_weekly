@@ -106,8 +106,7 @@ SMTP_PASS        # The app password (≠ google account password, see below)
 RECEIVER_EMAIL   # The email to send the newsletter to 
 PUBMED_API_KEY   # Pubmed API key
 ```
-<img width="1196" height="576" alt="Screenshot 2026-02-17 at 12 40 52" src="https://github.com/user-attachments/assets/13dd4623-0da6-4c1f-811b-8cadd65088e1" />
-
+<img width="1363" height="634" alt="Screenshot 2026-02-17 at 12 47 17" src="https://github.com/user-attachments/assets/50a0484b-a919-4e5f-a2b6-8f9916afc1f2" />
 
 #### Gmail Setup
 Create a dummy Google account to avoid security issues. If you are very nice I might share mine with you to spare you this hassle.
@@ -189,5 +188,6 @@ Each weekly email includes:
 
 
 Enjoy your weekly research digest ☕
+
 
 
