@@ -1,11 +1,7 @@
 name: Weekly paper digest
-
 on:
   schedule:
-    # GitHub cron is UTC.
-    # Winter (CET, Zurich UTC+1): 09:30 Zurich = 08:30 UTC
-    # Summer (CEST, Zurich UTC+2): 09:30 Zurich = 07:30 UTC  -> change to "30 7 * * 2" when DST starts
-    - cron: "30 8 * * 2"
+    - cron: "20 10 * * *"   # 11:20 Zurich (winter)
   workflow_dispatch:
 
 jobs:
@@ -47,3 +43,4 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
