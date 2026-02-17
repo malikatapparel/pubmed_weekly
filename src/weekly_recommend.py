@@ -74,7 +74,15 @@ from datetime import datetime, timedelta
 import os
 from email.message import EmailMessage
 import fetch_details
+import sys
 
+# =============================
+# Check if today is Tuesday
+now = datetime.now()
+
+if now.weekday() != 1:  # Monday=0, Tuesday=1
+    print("Not Tuesday. Exiting.")
+    sys.exit(0)
 
 # ===============================
 # 1. Load metadata and get paper candidates from keywords
