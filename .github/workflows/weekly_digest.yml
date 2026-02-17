@@ -1,6 +1,7 @@
 on:
   schedule:
-    - cron: "30 7 * * *"   # Daily 7:30 AM UTC
+    #- cron: "30 7 * * *"   # Daily 7:30 AM UTC
+    - cron: "53 14 * * *" 
   workflow_dispatch:
 jobs:
   send_digest:
@@ -40,6 +41,7 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
 
 
 
