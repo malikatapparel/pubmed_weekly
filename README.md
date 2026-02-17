@@ -42,13 +42,15 @@ your-repo/
 
 ## First-Time Setup
 
-### 1. Add your favorite papers
+### 1. Add your favorite papers & search strategy
 
-Add PMIDs of your favorite papers to:
+1. Add PMIDs of your favorite papers to:
 
 ```
 data/papers.csv
 ```
+
+2. in `weekly_recommend.py` at the very top of the page you can see the current search strategy, customize to fit your field
 
 ### 2. Generate embeddings
 
@@ -87,9 +89,55 @@ Place it in the repository root.
 
 Commit it. It is automatically updated after each successful weekly email
 
----
+### 3. Create all your GitHub Secrets
 
-## `weekly_recommend.py` 
+To run GitHub Actions, you need to define the following GitHub Secrets variables.
+
+In your repository:
+
+Settings → Secrets and variables → Actions (see screenshot below)
+
+
+Add the following secrets:
+
+```
+SMTP_USER        # The email adress to send the mails from
+SMTP_PASS        # The app password (≠ google account password, see below)
+RECEIVER_EMAIL   # The email to send the newsletter to 
+PUBMED_API_KEY   # Pubmed API key
+```
+<img width="1363" height="634" alt="Screenshot 2026-02-17 at 12 47 17" src="https://github.com/user-attachments/assets/50a0484b-a919-4e5f-a2b6-8f9916afc1f2" />
+
+#### Gmail Setup
+Create a dummy Google account to avoid security issues. If you are very nice I might share mine with you to spare you this hassle.
+You must:
+
+1. Enable 2-Step Verification in your Google account
+2. Generate an App Password for Mail
+3. Use that App Password as `SMTP_PASS`
+
+The script uses:
+
+- Server: `smtp.gmail.com`
+- Port: `587`
+- Encryption: `STARTTLS`
+
+
+#### How to create a PubMed API key
+
+To avoid rate limiting errors (HTTP 429: Too Many Requests), you must use a PubMed (NCBI) API key.
+
+1. Go to: https://www.ncbi.nlm.nih.gov/account/
+2. Sign in or create an account
+3. Generate an API key in your account settings
+
+### 4. Custom your automations
+
+The automation runs every Tuesday morning. You can adjust this in the workflow
+
+---
+## Additional details
+### `weekly_recommend.py` 
 
 `weekly_recommend.py` is the main automation script. It runs via GitHub Actions and performs the full weekly pipeline:
 
@@ -101,7 +149,7 @@ Commit it. It is automatically updated after each successful weekly email
 6. Sends a recommendation email  
 7. Updates `seen_papers.json` to avoid duplicates  
 
-## Automation with GitHub Actions
+### Automation with GitHub Actions
 
 The workflow file:
 
@@ -122,39 +170,7 @@ This ensures:
 
 ---
 
-## Required GitHub Secrets
-
-In your repository:
-
-Settings → Secrets and variables → Actions
-
-Add the following secrets:
-
-```
-SMTP_USER
-SMTP_PASS
-RECEIVER_EMAIL
-```
-
----
-
-## Gmail Setup
-Create a dummy Google account to avoid security issues. If you are very nice I might share mine with you to spare you this hassle.
-You must:
-
-1. Enable 2-Step Verification in your Google account
-2. Generate an App Password for Mail
-3. Use that App Password as `SMTP_PASS`
-
-The script uses:
-
-- Server: `smtp.gmail.com`
-- Port: `587`
-- Encryption: `STARTTLS`
-
----
-
-## How Recommendations Are Selected
+### How Recommendations Are Selected
 
 1. PubMed is queried using a domain-specific search string
 2. Candidate titles and abstracts are embedded
@@ -172,3 +188,6 @@ Each weekly email includes:
 
 
 Enjoy your weekly research digest ☕
+
+
+
