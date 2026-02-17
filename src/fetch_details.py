@@ -2,7 +2,7 @@ import requests
 import xml.etree.ElementTree as ET
 
 
-def fetch_paper(pmid):
+def fetch_paper(pmid, pubmed_api_key=None):
     '''
     Fetch bibliographic details for a given PubMed ID (PMID) using the NCBI E-utilities API.
 
@@ -14,7 +14,8 @@ def fetch_paper(pmid):
     params = {
         "db": "pubmed",
         "id": pmid,
-        "retmode": "xml"
+        "retmode": "xml",
+        "api_key": pubmed_api_key
     }
 
     r = requests.get(url, params=params)

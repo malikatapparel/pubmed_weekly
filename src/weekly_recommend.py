@@ -173,7 +173,7 @@ if pmids: # if list not empty
     papers = []
     for pmid in pmids:
         try:
-            paper_details = fetch_details.fetch_paper(pmid)
+            paper_details = fetch_details.fetch_paper(pmid, pubmed_api_key=pubmed_api_key)
             # First append the paper details to the papers list
             papers.append(paper_details)
             # Then create text for embedding (title + abstract)
@@ -231,7 +231,7 @@ email_body += "YOUR WEEKLY RECOMMENDATIONS\n"
 email_body += "----------------------------------\n\n"
 
 for pmid in top_pmids:
-     top_papers_detail = fetch_details.fetch_paper(pmid)
+     top_papers_detail = fetch_details.fetch_paper(pmid, pubmed_api_key=pubmed_api_key)
      link = f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/"
      paper_body = f"Title: {top_papers_detail['title']}\nAuthors: {', '.join(top_papers_detail['authors'][:3])}\nJournal: {top_papers_detail['journal']}\nLink: {link}\n\n"
      email_body += paper_body
