@@ -64,19 +64,17 @@ NOT
 )
 '''
 
-
 import requests
 import json
 import smtplib
-from email.mime.text import MIMEText
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime, timedelta
-from pymed import PubMed
 import os
-import fetch_details
 from email.message import EmailMessage
+import fetch_details
+
 
 # ===============================
 # 1. Load metadata and get paper candidates from keywords
@@ -250,6 +248,6 @@ with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
 
 # only if send succeeded, update seen items
 seen_pmids.update(top_pmids)
-with open('seen_papers.json', 'w') as f:
+with open('seen_pmids.json', 'w') as f:
     json.dump(sorted(seen_pmids), f)
 
