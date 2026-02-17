@@ -7,8 +7,6 @@ This script fetches weekly paper recommendations based on your favorite papers a
 # ===============================
 # 1. Define keywords and load your favorite papers
 # ===============================
-smtp_server = "smtp.gmail.com"
-smtp_port = 587
 # Neuroscience/eating behavior keywords (customize here)
 pubmed_query = pubmed_query = '''
 (
@@ -19,7 +17,7 @@ pubmed_query = pubmed_query = '''
   "food intake"[tiab] OR "food consumption"[tiab] OR
   "food cue*"[tiab] OR
   craving*[tiab] OR
-  obesity[tiab] OR overweight[tiab]
+  obesity[tiab] OR overweight[tiab] 
 )
 AND
 (
@@ -63,7 +61,9 @@ NOT
   mice[tiab]
 )
 '''
-
+# ===============================
+# 2. Import packages and retrieve credentials
+# ===============================
 import requests
 import json
 import smtplib
@@ -84,8 +84,31 @@ if now.weekday() != 1:  # Monday=0, Tuesday=1
     print("Not Tuesday. Exiting.")
     sys.exit(0)
 
+smtp_server = "smtp.gmail.com"
+smtp_port = 587
+
+# Retrieve credentials from environment variables (for production) or local file (for development)
+try: 
+    # Try to read the secrets but if not available (e.g. local run), read from local file
+    smtp_user = os.environ["SMTP_USER"]
+    smtp_pass = os.environ["SMTP_PASS"]
+    receiver = os.environ["RECEIVER_EMAIL"]
+    pubmed_api_key = os.environ["PUBMED_API_KEY"]
+except KeyError:
+    print("Secrets not found in environment variables, trying local file...")
+    try:
+        with open('data/credentials.json', 'r') as f:
+            creds = json.load(f)
+            smtp_user = creds["smtp_user"]
+            smtp_pass = creds["smtp_pass"]
+            receiver = creds["receiver"]
+            pubmed_api_key = creds["pubmed_api_key"]
+    except Exception as e:
+        print(f"Error reading credentials: {e}")
+        raise
+
 # ===============================
-# 1. Load metadata and get paper candidates from keywords
+# 3. Load metadata and get paper candidates from keywords
 # ===============================
 # LOAD YOUR FAVORITE PAPERS (from extract_metadata.py)
 print("Loading your favorite papers...")
@@ -102,7 +125,7 @@ except FileNotFoundError:
     print("No seen papers file - first run")
 # 
 
-# STEP 2: SEARCH PUBMED (last 30 days = new + missed papers)
+#  SEARCH PUBMED (last 30 days = new + missed papers)
 print("Searching PubMed for candidates...")
 today = datetime.now().strftime('%Y/%m/%d')
 last_year = (datetime.now().replace(year=datetime.now().year - 1)).strftime('%Y/%m/%d')
@@ -116,7 +139,8 @@ params_year = {
     'maxdate': today,
     'datetype': 'pdat',
     'retmax': 300,  # Get 200 candidates
-    'retmode': 'json'
+    'retmode': 'json',
+    "api_key": pubmed_api_key
 }
 
 year_pmids = requests.get('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi', params=params_year).json()['esearchresult']['idlist']
@@ -129,7 +153,8 @@ params_recent = {
     'maxdate': today,
     'datetype': 'pdat',
     'retmax': 100,  # Get 100 candidates
-    'retmode': 'json'
+    'retmode': 'json',
+    "api_key": pubmed_api_key
 }
 
 recent_pmids = requests.get('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi', params=params_recent).json()['esearchresult']['idlist']
@@ -159,7 +184,7 @@ if pmids: # if list not empty
             print(f"Error fetching details for PMID {pmid}: {e}")
 
   
-    # STEP 2B: ML RECOMMENDATION ENGINE  
+    #  ML RECOMMENDATION ENGINE  
     if candidate_papers:
         print("Running ML similarity matching...")
         candidate_texts = [paper[1] for paper in candidate_papers]
@@ -217,26 +242,8 @@ email_body += f"{n_selected} selected papers from {n_candidates} candidates.\n"
 email_body += f"Mean similarity of top 10 papers: {mean_top_similarity:.2f} -> {similarity_diagnostic}\n"
 
 # ===============================
-# 3. Send email with recommendations
+# 4. Send email with recommendations
 # ===============================
-
-# 1. Read secrets from GitHub Actions
-try: 
-    # Try to read the secrets but if not available (e.g. local run), read from local file
-    smtp_user = os.environ["SMTP_USER"]
-    smtp_pass = os.environ["SMTP_PASS"]
-    receiver = os.environ["RECEIVER_EMAIL"]
-except KeyError:
-    print("Secrets not found in environment variables, trying local file...")
-    try:
-        with open('data/credentials.json', 'r') as f:
-            creds = json.load(f)
-            smtp_user = creds["smtp_user"]
-            smtp_pass = creds["smtp_pass"]
-            receiver = creds["receiver"]
-    except Exception as e:
-        print(f"Error reading credentials: {e}")
-        raise
 
 # Send email
 msg = EmailMessage()
