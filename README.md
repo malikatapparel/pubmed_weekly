@@ -147,7 +147,7 @@ The automation runs every Tuesday morning 7.30 UTC. You can adjust the day in `w
 
 `weekly_recommend.py` is the main automation script. It runs via GitHub Actions and performs the full weekly pipeline:
 
-1. Checks if it is Tuesday (Zurich time)  # You can change for another day
+1. Checks if it is Tuesday # You can change for another day
 2. Loads your favorite paper embeddings  
 3. Queries PubMed for new candidate papers  
 4. Computes embedding similarity  
@@ -172,6 +172,7 @@ Each weekly email includes and how to troubleshoot:
 - Direct PubMed links
 
 Enjoy your weekly research digest ☕
+
 
 
 
