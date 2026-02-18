@@ -68,7 +68,7 @@ from datetime import datetime, timedelta
 # Check if today is Tuesday
 now = datetime.now()
 
-if now.weekday() != 1:  # Monday=0, Tuesday=1
+if now.weekday() != 2:  # Monday=0, Tuesday=1
     print("Not Tuesday. Exiting.")
     sys.exit(0)
 
@@ -88,24 +88,28 @@ from email.message import EmailMessage
 import fetch_details
 import argparse
 
-
 # Retrieve credentials from environment variables (for production) or local file (for development)
-try:
-    with open('credentials.json', 'r') as f:
-        creds = json.load(f)
-        smtp_user = creds["smtp_user"]
-        smtp_pass = creds["smtp_pass"]
-        receiver = creds["receiver"]
-        pubmed_api_key = creds["pubmed_api_key"]
-except Exception as e:
-    print(f"Error reading credentials: {e}")
-    raise
+# Comment this lines for now
+#try:
+#    with open('credentials.json', 'r') as f:
+#        creds = json.load(f)
+#        smtp_user = creds["smtp_user"]
+#        smtp_pass = creds["smtp_pass"]
+#        receiver = creds["receiver"]
+#        pubmed_api_key = creds["pubmed_api_key"]
 
 # For production, you would set these as environment variables and read them like this:
-# smtp_user = os.getenv("SMTP_USER")
-# smtp_pass = os.getenv("SMTP_PASS")
-# receiver = os.getenv("RECEIVER_EMAIL")
-# pubmed_api_key = os.getenv("PUBMED_API_KEY")
+parser = argparse.ArgumentParser(description='PubMed Weekly Recommendation System')
+parser.add_argument('--smtp_user', required=True, help='SMTP username for sending emails')
+parser.add_argument('--smtp_pass', required=True, help='SMTP password for sending emails')
+parser.add_argument('--receiver', required=True, help='Email address to receive the recommendations')
+parser.add_argument('--pubmed_api_key', required=True, help='API key for accessing PubMed data')
+args = parser.parse_args()
+
+smtp_user = args.smtp_user
+smtp_pass = args.smtp_pass
+receiver = args.receiver
+pubmed_api_key = args.pubmed_api_key
 # ===============================
 # 3. Load metadata and get paper candidates from keywords
 # ===============================
