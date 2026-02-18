@@ -1,6 +1,7 @@
 # For production, you would set these as environment variables and read them like this:
 import argparse
 from email.message import EmailMessage
+import smtplib
 # Get credentials from environment variables
 
 parser = argparse.ArgumentParser(description='PubMed Weekly Recommendation System')
