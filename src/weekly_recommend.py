@@ -4,6 +4,7 @@ Author: Malika Tapparel
 Description:
 This script fetches weekly paper recommendations based on your favorite papers and a set of keywords. 
 '''
+
 # ===============================
 # 1. Define keywords and load your favorite papers
 # ===============================
@@ -74,6 +75,7 @@ if now.weekday() != 1:  # Monday=0, Tuesday=1
 
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
+
 # ===============================
 # 2. Import packages and retrieve credentials
 # ===============================
@@ -134,6 +136,8 @@ today = datetime.now().strftime('%Y/%m/%d')
 last_year = (datetime.now().replace(year=datetime.now().year - 1)).strftime('%Y/%m/%d')
 last_2month = (datetime.now() - timedelta(days=60)).strftime('%Y/%m/%d') # papers of last 3 months to catch some missed ones
 
+seen_pmids_factor = int(len(seen_pmids)/3)
+
 # Get 100 candidatews from last year
 params_year = {
     'db': 'pubmed',
@@ -141,9 +145,9 @@ params_year = {
     'mindate': last_year,
     'maxdate': today,
     'datetype': 'pdat',
-    'retmax': 300,  # Get 200 candidates
+    'retmax': 400 + 2*seen_pmids_factor,  # Get 400 candidates and account for some seen ones
     'retmode': 'json',
-    "api_key": pubmed_api_key
+    "api_key": None
 }
 
 year_pmids = requests.get('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi', params=params_year).json()['esearchresult']['idlist']
@@ -155,9 +159,9 @@ params_recent = {
     'mindate': last_2month,
     'maxdate': today,
     'datetype': 'pdat',
-    'retmax': 100,  # Get 100 candidates
+    'retmax': 200 + seen_pmids_factor,  # Get 100 candidates and account for some seen ones
     'retmode': 'json',
-    "api_key": pubmed_api_key
+    "api_key": None
 }
 
 recent_pmids = requests.get('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi', params=params_recent).json()['esearchresult']['idlist']
