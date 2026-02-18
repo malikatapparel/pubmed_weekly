@@ -90,8 +90,7 @@ from email.message import EmailMessage
 import fetch_details
 import argparse
 
-# Retrieve credentials from environment variables (for production) or local file (for development)
-# Comment this lines for now
+# For local run: Retrieve credentials from local file
 #try:
 #    with open('credentials.json', 'r') as f:
 #        creds = json.load(f)
@@ -100,7 +99,7 @@ import argparse
 #        receiver = creds["receiver"]
 #        pubmed_api_key = creds["pubmed_api_key"]
 
-# For production, you would set these as environment variables and read them like this:
+# For production run: Retrieve credentials from command line arguments (e.g. from GitHub Actions secrets)
 parser = argparse.ArgumentParser(description='PubMed Weekly Recommendation System')
 parser.add_argument('--smtp_user', required=True, help='SMTP username for sending emails')
 parser.add_argument('--smtp_pass', required=True, help='SMTP password for sending emails')
@@ -138,7 +137,7 @@ last_2month = (datetime.now() - timedelta(days=60)).strftime('%Y/%m/%d') # paper
 
 seen_pmids_factor = int(len(seen_pmids)/3)
 
-# Get 100 candidatews from last year
+# Get candidatews from last year
 params_year = {
     'db': 'pubmed',
     'term': pubmed_query,
@@ -152,7 +151,7 @@ params_year = {
 
 year_pmids = requests.get('https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi', params=params_year).json()['esearchresult']['idlist']
 
-# Get 100 candidatews from last 60 days 
+# Get candidatews from last 60 days 
 params_recent = {
     'db': 'pubmed',
     'term': pubmed_query,
