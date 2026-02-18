@@ -1,5 +1,6 @@
 import os
-import repr as reprlib
+import reprlib
+
 
 smtp_user = os.getenv("SMTP_USER", "NOT SET")
 smtp_pass = os.getenv("SMTP_PASS", "NOT SET")
