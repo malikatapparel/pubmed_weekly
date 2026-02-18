@@ -61,6 +61,18 @@ NOT
   mice[tiab]
 )
 '''
+import sys
+
+# =============================
+# Check if today is Tuesday
+now = datetime.now()
+
+if now.weekday() != 1:  # Monday=0, Tuesday=1
+    print("Not Tuesday. Exiting.")
+    sys.exit(0)
+
+smtp_server = "smtp.gmail.com"
+smtp_port = 587
 # ===============================
 # 2. Import packages and retrieve credentials
 # ===============================
@@ -74,18 +86,7 @@ from datetime import datetime, timedelta
 import os
 from email.message import EmailMessage
 import fetch_details
-import sys
 
-# =============================
-# Check if today is Tuesday
-now = datetime.now()
-
-if now.weekday() != 1:  # Monday=0, Tuesday=1
-    print("Not Tuesday. Exiting.")
-    sys.exit(0)
-
-smtp_server = "smtp.gmail.com"
-smtp_port = 587
 
 # Retrieve credentials from environment variables (for production) or local file (for development)
 try:
