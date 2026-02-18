@@ -44,11 +44,14 @@ your-repo/
 
 ### 1. Add your favorite papers & search strategy
 
-1. Add PMIDs of your favorite papers to:
+1. Add PMIDs of your favorite papers in a csv file 
 
 ```
 data/papers.csv
 ```
+With columns 'pmids', 'title', 'abstract', 'authors', 'journal', 'pubdate'
+
+Add only the pmids from your favorite papers in the column. The script will do the rest.
 
 2. in `weekly_recommend.py` at the very top of the page you can see the current search strategy, customize to fit your field
 
@@ -85,13 +88,11 @@ Save it as:
 seen_pmids.json
 ```
 
-Place it in the repository root.
+Place it in the repository root. It is automatically updated after each successful weekly email to include already seen papers.
 
-Commit it. It is automatically updated after each successful weekly email
+### 3. Create all your GitHub Secrets & enable actions
 
-### 3. Create all your GitHub Secrets
-
-To run GitHub Actions, you need to define the following GitHub Secrets variables.
+1. To run GitHub Actions, you need to define the following GitHub Secrets variables.
 
 In your repository:
 
@@ -108,16 +109,15 @@ PUBMED_API_KEY   # Pubmed API key
 ```
 <img width="1363" height="634" alt="Screenshot 2026-02-17 at 12 47 17" src="https://github.com/user-attachments/assets/50a0484b-a919-4e5f-a2b6-8f9916afc1f2" />
 
-**WARDING: For now the script uses the credentials.json file. Before going live I need to fix this issue**
-
+2. Go to Settings → Actions → General and make sure actions are enabled throughout for your workflow
 
 #### Gmail Setup
-Create a dummy Google account to avoid security issues. If you are very nice I might share mine with you to spare you this hassle.
+Create a dummy Google account to avoid security issues. If you are very nice, I might share mine with you to spare you this hassle.
 You must:
 
 1. Enable 2-Step Verification in your Google account
 2. Generate an App Password for Mail
-3. Use that App Password as `SMTP_PASS`
+3. Use that App Password as `SMTP_PASS`, it is a 16-digit password with spaces.
 
 The script uses:
 
@@ -125,8 +125,9 @@ The script uses:
 - Port: `587`
 - Encryption: `STARTTLS`
 
+Adjust if you used another server.
 
-#### How to create a PubMed API key
+### 4. Create a PubMed API key
 
 To avoid rate limiting errors (HTTP 429: Too Many Requests), you must use a PubMed (NCBI) API key.
 
@@ -136,7 +137,7 @@ To avoid rate limiting errors (HTTP 429: Too Many Requests), you must use a PubM
 
 ### 4. Custom your automations
 
-The automation runs every Tuesday morning. You can adjust this in the workflow
+The automation runs every Tuesday morning 7.30 UTC. You can adjust the day in `weekly_recommend.py` script, and the time in the workflow.
 
 ---
 ## Additional details
@@ -152,45 +153,26 @@ The automation runs every Tuesday morning. You can adjust this in the workflow
 6. Sends a recommendation email  
 7. Updates `seen_papers.json` to avoid duplicates  
 
-### Automation with GitHub Actions
-
-The workflow file:
-
-```
-.github/workflows/weekly_digest.yml
-```
-
-Schedules the script to run daily at a specified UTC time.
-
-The Python script checks whether it is Tuesday before sending.
-
-This ensures:
-
-- The workflow runs daily
-- The script exits immediately unless it is Tuesday
-- Email is sent once per week
-- No duplicate papers are sent
-
----
-
 ### How Recommendations Are Selected
 
 1. PubMed is queried using a domain-specific search string
 2. Candidate titles and abstracts are embedded
-3. Cosine similarity is computed against your favorite embeddings
+3. Cosine similarity is computed against your favorite embeddings (all-MiniLM-L6-v2)
 4. The top matches are selected
 5. A similarity diagnostic is included in the email
 
-Each weekly email includes:
+Each weekly email includes and how to troubleshoot:
 
-- Selected papers
-- Number of screened candidates
+- Selected papers → If they are not relevant, broaden your PubMed query and/or diversify the favorite papers in `data/papers.csv`.
+- Number of screened candidates → If this is low (<200), broaden your search strategy (add OR terms, relax filters, increase `retmax`).
 - Mean similarity score
-- A qualitative similarity rating
+- A qualitative similarity rating → If LOW or MODERATE, your query may be too broad or your favorites too narrow/heterogeneous.
 - Direct PubMed links
 
-
 Enjoy your weekly research digest ☕
+
+
+
 
 
 
