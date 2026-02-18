@@ -27,8 +27,9 @@ your-repo/
 │
 ├── src/
 │   ├── weekly_recommend.py         # Weekly script (runs via GitHub Actions)
-│   └── fetch_metadata.py           # Run when updating favorite papers (once at the start + each time you update your list)
-│                                   # Fetches metadata + computes embeddings
+│   └── fetch_metadata.py           # Run when updating favorite papers (once at the start + each time you update your list) -> Fetches metadata + computes embeddings
+│   └── check_credentials.py        # Script to test send an email with your credentials (secrets), to lauch through the credentials_test.yml workflow
+│                                   
 │
 ├── favorite_embeddings.npy         # Saved embedding profile
 ├── seen_pmids.json                # Tracks already-sent papers (initialize as empty list [])
@@ -36,6 +37,7 @@ your-repo/
 └── .github/
     └── workflows/
         └── weekly_digest.yml       # GitHub Actions scheduler
+        └── credentials_test.yml    # GitHub Actions allowing you to test your credentials
 ```
 
 ---
@@ -170,6 +172,7 @@ Each weekly email includes and how to troubleshoot:
 - Direct PubMed links
 
 Enjoy your weekly research digest ☕
+
 
 
 
