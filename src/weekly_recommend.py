@@ -86,6 +86,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import os
 from email.message import EmailMessage
 import fetch_details
+import argparse
 
 
 # Retrieve credentials from environment variables (for production) or local file (for development)
@@ -100,7 +101,6 @@ except Exception as e:
     print(f"Error reading credentials: {e}")
     raise
 
-# For production, you would set these as environment variables and read them like this:
 # smtp_user = os.getenv("SMTP_USER")
 # smtp_pass = os.getenv("SMTP_PASS")
 # receiver = os.getenv("RECEIVER_EMAIL")
