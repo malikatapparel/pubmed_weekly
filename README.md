@@ -108,8 +108,6 @@ PUBMED_API_KEY   # Pubmed API key
 ```
 <img width="1363" height="634" alt="Screenshot 2026-02-17 at 12 47 17" src="https://github.com/user-attachments/assets/50a0484b-a919-4e5f-a2b6-8f9916afc1f2" />
 
-**WARDING: For now the script uses the credentials.json file. Before going live I need to fix this issue**
-
 
 #### Gmail Setup
 Create a dummy Google account to avoid security issues. If you are very nice I might share mine with you to spare you this hassle.
@@ -191,6 +189,7 @@ Each weekly email includes:
 
 
 Enjoy your weekly research digest ☕
+
 
 
 
