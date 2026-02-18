@@ -62,6 +62,7 @@ NOT
 )
 '''
 import sys
+from datetime import datetime, timedelta
 
 # =============================
 # Check if today is Tuesday
@@ -82,7 +83,6 @@ import smtplib
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from datetime import datetime, timedelta
 import os
 from email.message import EmailMessage
 import fetch_details
