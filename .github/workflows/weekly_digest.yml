@@ -26,12 +26,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run weekly digest script
-        env:
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-          PUBMED_API_KEY: ${{ secrets.PUBMED_API_KEY }}
-        run: python src/weekly_recommend.py
+        run: python src/weekly_recommend.py --smtp_user "${{ secrets.SMTP_USER }}" --smtp_pass "${{ secrets.SMTP_PASS }}" --receiver "${{ secrets.RECEIVER_EMAIL }}" --pubmed_api_key "${{ secrets.PUBMED_API_KEY }}"
 
       - name: Commit updated seen_pmids.json
         run: |
@@ -45,6 +40,7 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
 
 
 
