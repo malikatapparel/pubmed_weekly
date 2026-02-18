@@ -67,7 +67,7 @@ import sys
 # Check if today is Tuesday
 now = datetime.now()
 
-if now.weekday() != 1:  # Monday=0, Tuesday=1
+if now.weekday() != 2:  # Monday=0, Tuesday=1
     print("Not Tuesday. Exiting.")
     sys.exit(0)
 
