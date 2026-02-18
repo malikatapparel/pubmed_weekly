@@ -32,9 +32,4 @@ with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
     server.ehlo()
     server.login(smtp_user, smtp_pass)
     server.send_message(msg)
-    print(f"Email sent to {receiver} with {n_selected} papers recommended.")
-
-# only if send succeeded, update seen items
-seen_pmids.update(top_pmids)
-with open('seen_pmids.json', 'w') as f:
-    json.dump(sorted(seen_pmids), f)
+    print(f"Email sent to {receiver}.")
