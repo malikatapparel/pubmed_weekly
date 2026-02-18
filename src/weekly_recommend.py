@@ -68,7 +68,7 @@ from datetime import datetime, timedelta
 # Check if today is Tuesday
 now = datetime.now()
 
-if now.weekday() != 2:  # Monday=0, Tuesday=1
+if now.weekday() != 1:  # Monday=0, Tuesday=1
     print("Not Tuesday. Exiting.")
     sys.exit(0)
 
@@ -101,6 +101,7 @@ except Exception as e:
     print(f"Error reading credentials: {e}")
     raise
 
+# For production, you would set these as environment variables and read them like this:
 # smtp_user = os.getenv("SMTP_USER")
 # smtp_pass = os.getenv("SMTP_PASS")
 # receiver = os.getenv("RECEIVER_EMAIL")
