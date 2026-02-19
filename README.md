@@ -51,7 +51,7 @@ your-repo/
 ```
 data/papers.csv
 ```
-With columns 'pmids', 'title', 'abstract', 'authors', 'journal', 'pubdate'
+With columns `pmids`, `title`, `abstract`, `authors`, `journal` and `pubdate`
 
 Add only the pmids from your favorite papers in the column. The script will do the rest.
 
@@ -94,7 +94,7 @@ Place it in the repository root. It is automatically updated after each successf
 
 ### 3. Create all your GitHub Secrets & enable actions
 
-1. To run GitHub Actions, you need to define the following GitHub Secrets variables.
+1. To run GitHub Actions, you need to define GitHub Secrets variables with your credentials and PubMed API
 
 In your repository:
 
@@ -129,17 +129,19 @@ The script uses:
 
 Adjust if you used another server.
 
-### 4. Create a PubMed API key
+#### Create a PubMed API key
 
-To avoid rate limiting errors (HTTP 429: Too Many Requests), you must use a PubMed (NCBI) API key.
+To avoid rate limiting errors, you must use a PubMed (NCBI) API key.
 
 1. Go to: https://www.ncbi.nlm.nih.gov/account/
 2. Sign in or create an account
 3. Generate an API key in your account settings
 
-### 4. Custom your automations
+### 4. Set up your automation
 
 The automation runs every Tuesday morning 7.30 UTC. You can adjust the day in `weekly_recommend.py` script, and the time in the workflow.
+
+You can check your credentials work by manually launching the `credentials_test.yml` workflow. 
 
 ---
 ## Additional details
