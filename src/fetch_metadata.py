@@ -1,6 +1,6 @@
 
 '''
-Project: Weekly Paper Recommendations
+Project: Weekly PubMed Papers Recommender
 Author: Malika Tapparel
 Description:
 This script fetches metadata for papers from PubMed using their PMIDs, 
