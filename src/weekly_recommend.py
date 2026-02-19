@@ -6,7 +6,7 @@ This script fetches weekly paper recommendations based on your favorite papers a
 '''
 
 # ===============================
-# 1. Define keywords and load your favorite papers
+# 1. Define keywords
 # ===============================
 # Neuroscience/eating behavior keywords (customize here)
 pubmed_query = pubmed_query = '''
@@ -65,7 +65,9 @@ NOT
 import sys
 from datetime import datetime, timedelta
 
-# =============================
+# ===============================
+# 2. Define day & server
+# ===============================
 # Check if today is Tuesday
 now = datetime.now()
 
@@ -73,6 +75,7 @@ if now.weekday() != 1:  # Monday=0, Tuesday=1
     print("Not Tuesday. Exiting.")
     sys.exit(0)
 
+# Define server and port
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
 
@@ -90,7 +93,7 @@ from email.message import EmailMessage
 import fetch_details
 import argparse
 
-# For local run: Retrieve credentials from local file
+# For local run: Retrieve credentials from a local credentials.json file
 #try:
 #    with open('credentials.json', 'r') as f:
 #        creds = json.load(f)
@@ -98,6 +101,7 @@ import argparse
 #        smtp_pass = creds["smtp_pass"]
 #        receiver = creds["receiver"]
 #        pubmed_api_key = creds["pubmed_api_key"]
+
 
 # For production run: Retrieve credentials from command line arguments (e.g. from GitHub Actions secrets)
 parser = argparse.ArgumentParser(description='PubMed Weekly Recommendation System')
@@ -111,8 +115,9 @@ smtp_user = args.smtp_user
 smtp_pass = args.smtp_pass
 receiver = args.receiver
 pubmed_api_key = args.pubmed_api_key
+
 # ===============================
-# 3. Load metadata and get paper candidates from keywords
+# 4. Load metadata and get paper candidates from keywords
 # ===============================
 # LOAD YOUR FAVORITE PAPERS (from extract_metadata.py)
 print("Loading your favorite papers...")
@@ -129,7 +134,7 @@ except FileNotFoundError:
     print("No seen papers file - first run")
 # 
 
-#  SEARCH PUBMED (last 30 days = new + missed papers)
+#  SEARCH PUBMED (last year + last 60 days = new + missed papers)
 print("Searching PubMed for candidates...")
 today = datetime.now().strftime('%Y/%m/%d')
 last_year = (datetime.now().replace(year=datetime.now().year - 1)).strftime('%Y/%m/%d')
@@ -170,6 +175,10 @@ pmids = list(
 )
  # this is ~300 papers
 print(f"Found {len(pmids)} new candidate papers to evaluate")
+
+# ===============================
+# 5. Get 10 top papers using ML similarity matching
+# ===============================
 
 # GET FULL DETAILS
 if pmids:
@@ -236,6 +245,11 @@ elif mean_top_similarity < 0.60:
 else:
     similarity_diagnostic = "EXCELLENT"
 
+# ===============================
+# 6. Send email with recommendations
+# ===============================
+
+# PREPARE EMAIL CONTENT
 email_body = ""
 email_body += "YOUR WEEKLY RECOMMENDATIONS\n"
 email_body += "----------------------------------\n\n"
@@ -254,11 +268,7 @@ email_body += "Automated weekly recommender\n"
 email_body += f"{n_selected} selected papers from {n_candidates} candidates.\n"
 email_body += f"Mean similarity of top 10 papers: {mean_top_similarity:.2f} -> {similarity_diagnostic}\n"
 
-# ===============================
-# 4. Send email with recommendations
-# ===============================
-
-# Send email
+# SEND EMAIL
 msg = EmailMessage()
 msg["Subject"] = "☕ Weekly recommendations"
 msg["From"] = smtp_user
@@ -274,6 +284,9 @@ with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
     server.send_message(msg)
     print(f"Email sent to {receiver} with {n_selected} papers recommended.")
 
+# ===============================
+# 7. Update seen papers list
+# ===============================
 # only if send succeeded, update seen items
 seen_pmids.update(top_pmids)
 with open('seen_pmids.json', 'w') as f:
