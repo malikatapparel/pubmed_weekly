@@ -1,5 +1,5 @@
 '''
-Project: Weekly Paper Recommendations
+Project: Weekly PubMed Papers Recommender
 Author: Malika Tapparel
 Description:
 This script fetches weekly paper recommendations based on your favorite papers and a set of keywords. 
