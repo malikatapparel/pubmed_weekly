@@ -92,7 +92,7 @@ seen_pmids.json
 
 Place it in the repository root. It is automatically updated after each successful weekly email to include already seen papers.
 
-### 3. Create all your GitHub Secrets & enable actions
+### 4. Create all your GitHub Secrets & enable actions
 
 1. To run GitHub Actions, you need to define GitHub Secrets variables with your credentials and PubMed API
 
@@ -137,11 +137,13 @@ To avoid rate limiting errors, you must use a PubMed (NCBI) API key.
 2. Sign in or create an account
 3. Generate an API key in your account settings
 
-### 4. Set up your automation
+### 5. Set up your automation
 
-The automation runs every Tuesday morning 7.30 UTC. You can adjust the day in `weekly_recommend.py` script, and the time in the workflow.
+The automation runs every Tuesday morning 7.30 UTC (with the customary 20-40min GitHub delay --'). You can adjust the day in `weekly_recommend.py` script, and the time in the workflow.
 
 You can check your credentials work by manually launching the `credentials_test.yml` workflow. 
+
+
 
 ---
 ## Additional details
@@ -174,6 +176,7 @@ Each weekly email includes and how to troubleshoot:
 - Direct PubMed links
 
 Enjoy your weekly research digest ☕
+
 
 
 
