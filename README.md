@@ -153,7 +153,7 @@ You can check your credentials work by manually launching the `credentials_test.
 
 1. Checks if it is Tuesday # You can change for another day
 2. Loads your favorite paper embeddings  
-3. Queries PubMed for new candidate papers  
+3. Queries PubMed for new candidate papers  (takes 400 papers from last year and 200 from the last 2 months)
 4. Computes embedding similarity  
 5. Selects the top matches  
 6. Sends a recommendation email  
@@ -170,12 +170,13 @@ You can check your credentials work by manually launching the `credentials_test.
 Each weekly email includes and how to troubleshoot:
 
 - Selected papers → If they are not relevant, broaden your PubMed query and/or diversify the favorite papers in `data/papers.csv`.
-- Number of screened candidates → If this is low (<200), broaden your search strategy (add OR terms, relax filters, increase `retmax`).
+- Number of screened candidates → If this is low (<300), broaden your search strategy (add OR terms, relax filters, increase `retmax`).
 - Mean similarity score
 - A qualitative similarity rating → If LOW or MODERATE, your query may be too broad or your favorites too narrow/heterogeneous.
 - Direct PubMed links
 
 Enjoy your weekly research digest ☕
+
 
 
 
