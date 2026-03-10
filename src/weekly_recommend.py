@@ -18,7 +18,8 @@ pubmed_query = pubmed_query = '''
   "food intake"[tiab] OR "food consumption"[tiab] OR
   "food cue*"[tiab] OR
   craving*[tiab] OR
-  obesity[tiab] OR overweight[tiab] 
+  obesity[tiab] OR overweight[tiab] OR
+  addiction[tiab] OR "motivated behavior"[tiab] OR "motivated behaviour"
 )
 AND
 (
@@ -30,6 +31,7 @@ AND
   "goal-tracking"[tiab] OR
   "learning bias"[tiab] OR
   "decision making"[tiab] OR
+  "decision-making"[tiab] OR
   valuation[tiab] OR
   "approach bias"[tiab] OR
   "inhibitory control"[tiab] OR
@@ -48,7 +50,6 @@ AND
   "classification"[tiab] OR
   "decoding"[tiab] OR
   "multivariate"[tiab] OR
-  "MVPA"[tiab] OR
   "computational model*"[tiab]
 )
 NOT
